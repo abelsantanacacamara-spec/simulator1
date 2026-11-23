@@ -1,0 +1,58 @@
+
+// adicionar-nota.js - Comando para o dono do bot adicionar nota customizada no perfil
+const { SlashCommandBuilder, MessageFlags } = require('discord.js');
+const { createSuccessEmbed, createErrorEmbed } = require('../utils/embeds');
+const { getEmojis } = require('../utils/emojis');
+const { setBotNote, isOwnerOrAuthorized } = require('../utils/database');
+
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('adicionar-nota')
+        .setDescription('[DONO] Adiciona uma nota customizada no perfil do bot')
+        .addStringOption(option =>
+            option.setName('nota')
+                .setDescription('A nota que aparecerá no perfil do bot')
+                .setRequired(true)
+                .setMaxLength(128)),
+    
+    async execute(interaction) {
+        const emojis = getEmojis(interaction.client);
+        
+        if (!(await isOwnerOrAuthorized(interaction.user.id))) {
+            return interaction.reply({
+                embeds: [createErrorEmbed('Apenas o dono do bot pode usar este comando.', interaction.client)],
+                flags: MessageFlags.Ephemeral
+            });
+        }
+
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
+        const nota = interaction.options.getString('nota');
+
+        try {
+            await setBotNote(nota);
+
+            await interaction.client.user.setPresence({
+                activities: [{
+                    name: nota,
+                    type: 4
+                }],
+                status: 'dnd'
+            });
+
+            await interaction.editReply({
+                embeds: [createSuccessEmbed(
+                    `Nota atualizada com sucesso!\n\n**Nova nota:** ${nota}\n\nA nota foi salva e permanecerá mesmo após reiniciar o bot.`,
+                    interaction.client
+                )]
+            });
+
+            console.log(`📝 Nota do bot atualizada por ${interaction.user.tag}: "${nota}"`);
+        } catch (error) {
+            console.error('Erro ao atualizar nota do bot:', error);
+            await interaction.editReply({
+                embeds: [createErrorEmbed('Erro ao atualizar a nota do bot.', interaction.client)]
+            });
+        }
+    }
+};

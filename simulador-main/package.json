@@ -1,0 +1,35 @@
+
+{
+  "name": "discord-tournament-bot",
+  "version": "1.0.0",
+  "description": "Complete Discord tournament bot with bracket management, ranking system, and automated match handling",
+  "main": "index.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "deploy": "node deploy-commands.js",
+    "migrate": "node migrate-to-db.js"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "tournament",
+    "bracket",
+    "ranking"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "discord.js": "^14.25.1",
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-session": "^1.18.0",
+    "openai": "^4.52.0",
+    "pg": "^8.11.3",
+    "session-file-store": "^1.5.0"
+  }
+}
